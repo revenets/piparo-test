@@ -12,18 +12,25 @@ import {
 import { Image } from 'expo-image';
 import { MaterialIcons } from '@expo/vector-icons';
 
-import { ImageDto } from 'types/image-dto.type';
+import { useImagesStore } from 'store/images-store';
 
 type ImageInfoModalProps = {
   visible: boolean;
   onClose: () => void;
-  image: ImageDto | null;
+  imageId: string | null;
 };
 
-const ImageInfoModal: FC<ImageInfoModalProps> = ({ visible, onClose, image }) => {
+const ImageInfoModal: FC<ImageInfoModalProps> = ({ visible, onClose, imageId }) => {
   const { width: screenWidth } = useWindowDimensions();
+  const { images } = useImagesStore();
 
-  if (!visible || !image) return null;
+  if (!visible || !imageId) return null;
+
+  const image = images[imageId];
+
+  if (!image) {
+    return null;
+  }
 
   const infoBoxWidth = screenWidth * 0.85;
 
@@ -45,7 +52,7 @@ const ImageInfoModal: FC<ImageInfoModalProps> = ({ visible, onClose, image }) =>
             className="items-center rounded-2xl bg-white px-4 pb-6 pt-4"
             style={{ width: infoBoxWidth }}
             onPress={(e) => e.stopPropagation()}>
-            <View className="self-end rounded-full bg-white p-1 mb-5 shadow-sm shadow-black">
+            <View className="mb-5 self-end rounded-full bg-white p-1 shadow-sm shadow-black">
               <TouchableOpacity onPress={onClose} hitSlop={8}>
                 <MaterialIcons name="close" size={24} color="black" />
               </TouchableOpacity>

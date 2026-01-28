@@ -8,11 +8,9 @@ import {
   PlatformColor,
   StyleSheet,
   Text,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
-import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { GlassView } from 'expo-glass-effect';
@@ -20,20 +18,20 @@ import { GlassView } from 'expo-glass-effect';
 import { ImageInfoModal } from 'components/image-info-modal';
 import { GalleryModeSwitch } from 'components/gallery-mode-switch';
 import { GalleryImageItem, MIN_ITEM_HEIGHT } from 'components/gallery-image-item';
+import { GalleryGridItem } from 'components/gallery-grid-item';
 
 import { useFetchImagesList } from 'hooks/use-images-list.hook';
 import { useImagesStore } from 'store/images-store';
-import { ImageDto } from 'types/image-dto.type';
 
 const GalleryScreen: FC = () => {
   const [isImageInfoModalVisible, setIsImageInfoModalVisible] = useState<boolean>(false);
-  const [selectedImage, setSelectedImage] = useState<ImageDto | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [listColsNumber, setListColsNumber] = useState<number>(1);
   const { bottom, top } = useSafeAreaInsets();
 
   const y = useSharedValue(0);
 
-  const { images } = useImagesStore();
+  const { imageIds, hideImage } = useImagesStore();
   const { fetchMoreImages, isLoading, isLoadingMore } = useFetchImagesList();
 
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -44,43 +42,41 @@ const GalleryScreen: FC = () => {
     return (screenWidth - 32 - totalSpacing) / listColsNumber;
   }, [listColsNumber, screenWidth]);
 
-  const itemHeight = useMemo<number>(() => {
-    if (listColsNumber === 1) {
-      return (itemWidth * 9) / 16;
-    } else {
-      return itemWidth;
-    }
-  }, [itemWidth, listColsNumber]);
-
   const renderImageItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<ImageDto>) => {
+    ({ item, index }: ListRenderItemInfo<string>) => {
       const handleOnPress = async (e: GestureResponderEvent) => {
         e.stopPropagation();
         setSelectedImage(item);
         setIsImageInfoModalVisible(true);
       };
 
+      const handleHideImage = (e: GestureResponderEvent) => {
+        e.stopPropagation();
+        hideImage(item);
+      };
+
       if (listColsNumber === 1) {
-        return <GalleryImageItem index={index} item={item} onPress={handleOnPress} y={y} />;
+        return (
+          <GalleryImageItem
+            index={index}
+            item={item}
+            onPress={handleOnPress}
+            onHide={handleHideImage}
+            y={y}
+          />
+        );
       }
 
       return (
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className="mb-2.5 overflow-hidden rounded-2xl"
-          onPress={handleOnPress}>
-          <Animated.View style={[{ width: itemWidth, height: itemHeight }]}>
-            <Image
-              source={{ uri: item.download_url }}
-              style={StyleSheet.absoluteFill}
-              cachePolicy={'memory-disk'}
-              contentFit="cover"
-            />
-          </Animated.View>
-        </TouchableOpacity>
+        <GalleryGridItem
+          item={item}
+          itemSize={itemWidth}
+          onPress={handleOnPress}
+          onHide={handleHideImage}
+        />
       );
     },
-    [itemHeight, itemWidth, listColsNumber, y],
+    [hideImage, itemWidth, listColsNumber, y],
   );
 
   const onListScroll = useAnimatedScrollHandler({
@@ -117,8 +113,8 @@ const GalleryScreen: FC = () => {
       ) : (
         <Animated.FlatList
           key={`${listColsNumber}-list`}
-          data={images}
-          keyExtractor={(item) => item.id}
+          data={imageIds}
+          keyExtractor={(item) => item}
           renderItem={renderImageItem}
           onEndReachedThreshold={listColsNumber === 1 ? 0.5 : 0.8}
           onEndReached={fetchMoreImages}
@@ -140,7 +136,7 @@ const GalleryScreen: FC = () => {
         />
       )}
       <ImageInfoModal
-        image={selectedImage}
+        imageId={selectedImage}
         visible={isImageInfoModalVisible}
         onClose={() => setIsImageInfoModalVisible(false)}
       />

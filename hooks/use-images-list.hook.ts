@@ -20,7 +20,15 @@ const useFetchImagesList = () => {
       const response = await fetch(`${API_URL}?page=1&limit=${PAGE_LIMIT}`);
       const data: ImageDto[] = await response.json();
 
-      setImages(data);
+      const normalizedData: Record<string, ImageDto> = {};
+      data.forEach((image) => {
+        normalizedData[image.id] = image;
+      });
+
+      setImages(
+        normalizedData,
+        data.map((img) => img.id),
+      );
       lastRequestedPageRef.current = 1;
       setIsLoading(false);
     } catch (error) {
@@ -43,7 +51,15 @@ const useFetchImagesList = () => {
       const response = await fetch(`${API_URL}?page=${nextPage}&limit=${PAGE_LIMIT}`);
       const data: ImageDto[] = await response.json();
 
-      addImages(data);
+      const normalizedData: Record<string, ImageDto> = {};
+      data.forEach((image) => {
+        normalizedData[image.id] = image;
+      });
+
+      addImages(
+        normalizedData,
+        data.map((img) => img.id),
+      );
     } catch (error) {
       console.error('Error fetching more images:', error);
     } finally {
