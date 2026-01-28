@@ -1,4 +1,4 @@
-import { StyleSheet, View, Pressable } from 'react-native';
+import { StyleSheet, View, Pressable, Platform } from 'react-native';
 import { GlassView, GlassContainer } from 'expo-glass-effect';
 import { MaterialIcons } from '@expo/vector-icons';
 import Animated, {
@@ -10,6 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { FC, useEffect, useRef } from 'react';
 import { scheduleOnRN, scheduleOnUI } from 'react-native-worklets';
+import { BlurView } from 'expo-blur';
 
 const AnimatedGlassView = createAnimatedComponent(GlassView);
 
@@ -87,12 +88,16 @@ const GalleryModeSwitch: FC<GalleryModeSwitchProps> = ({
   return (
     <Animated.View style={style} className={containerClassName}>
       <GlassContainer spacing={10} style={styles.containerStyle}>
-        <AnimatedGlassView
-          glassEffectStyle="regular"
-          style={[styles.glass1, indicatorAnimationStyle]}
-          isInteractive
-        />
-        <View className="flex-row ">
+        <Animated.View style={[styles.glass1, indicatorAnimationStyle]}>
+          <AnimatedGlassView glassEffectStyle="regular" style={[styles.glass1]} />
+          {Platform.OS === 'android' && (
+            <View style={StyleSheet.absoluteFill} className="overflow-hidden rounded-3xl">
+              <BlurView intensity={50} tint="light" style={StyleSheet.absoluteFill} />
+            </View>
+          )}
+        </Animated.View>
+
+        <View className="z-3 flex-row">
           <Pressable
             className="relative flex-1 items-center"
             onPress={() => scheduleOnUI(handlePress, 1)}>
@@ -141,6 +146,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 40,
     borderRadius: 30,
-    zIndex: 2,
+    zIndex: 0,
   },
 });

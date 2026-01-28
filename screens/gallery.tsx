@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   GestureResponderEvent,
   ListRenderItemInfo,
+  Platform,
   PlatformColor,
   StyleSheet,
   Text,
@@ -14,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { GlassView } from 'expo-glass-effect';
+import { BlurView } from 'expo-blur';
 
 import { ImageInfoModal } from 'components/image-info-modal';
 import { GalleryModeSwitch } from 'components/gallery-mode-switch';
@@ -101,6 +103,11 @@ const GalleryScreen: FC = () => {
       />
       <View className="absolute left-4 w-screen rounded-t-3xl" style={{ top: top + 8 }}>
         <GlassView glassEffectStyle="regular" style={styles.glass}>
+          {Platform.OS === 'android' && (
+            <View style={StyleSheet.absoluteFill} className="z-2 overflow-hidden rounded-3xl">
+              <BlurView intensity={80} tint="extraLight" style={StyleSheet.absoluteFill} />
+            </View>
+          )}
           <Text className="text-2xl font-bold" style={{ color: PlatformColor('labelColor') }}>
             Image Gallery
           </Text>
