@@ -8,7 +8,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <GalleryScreen />
-      <StatusBar style="auto" translucent />
+      <StatusBar translucent  />
     </SafeAreaProvider>
   );
 }

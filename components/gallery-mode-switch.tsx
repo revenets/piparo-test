@@ -29,7 +29,7 @@ const GalleryModeSwitch: FC<GalleryModeSwitchProps> = ({
   const progress = useSharedValue(value === 1 ? 0 : 1);
   const isFirstRenderRef = useRef(true);
 
-  const ACTIVE_COLOR = '#5203fc';
+  const ACTIVE_COLOR = '#192740';
   const INACTIVE_COLOR = '#ffffff';
 
   const indicatorAnimationStyle = useAnimatedStyle(() => {
@@ -87,7 +87,11 @@ const GalleryModeSwitch: FC<GalleryModeSwitchProps> = ({
   return (
     <Animated.View style={style} className={containerClassName}>
       <GlassContainer spacing={10} style={styles.containerStyle}>
-        <AnimatedGlassView style={[styles.glass1, indicatorAnimationStyle]} isInteractive />
+        <AnimatedGlassView
+          glassEffectStyle="regular"
+          style={[styles.glass1, indicatorAnimationStyle]}
+          isInteractive
+        />
         <View className="flex-row ">
           <Pressable
             className="relative flex-1 items-center"
@@ -128,7 +132,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#7a7580b3',
+    backgroundColor: '#9e9e9eb3',
     borderRadius: 75,
     paddingHorizontal: 8,
   },

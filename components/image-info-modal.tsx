@@ -7,8 +7,10 @@ import {
   Text,
   Modal,
   Linking,
+  TouchableOpacity,
 } from 'react-native';
 import { Image } from 'expo-image';
+import { MaterialIcons } from '@expo/vector-icons';
 
 import { ImageDto } from 'types/image-dto.type';
 
@@ -38,38 +40,48 @@ const ImageInfoModal: FC<ImageInfoModalProps> = ({ visible, onClose, image }) =>
           blurRadius={40}
         />
 
-        <Pressable
-          className="items-center rounded-2xl bg-white px-4 py-6"
-          style={{ width: infoBoxWidth }}
-          onPress={(e) => e.stopPropagation()}>
-          <View className="relative overflow-hidden rounded-xl">
-            <Image
-              source={{ uri: image.download_url }}
-              className="rounded-xl"
-              style={{ width: imageSize, height: imageSize }}
-              contentFit="cover"
-              priority="high"
-              cachePolicy="memory-disk"
-              placeholder={{ blurhash: 'L6PZfSi_.AyE_3t7t7R**0o#DgR4' }}
-              transition={200}
-            />
-            <View
-              className="absolute bottom-0 left-0 right-0 top-0 rounded-xl"
-              style={styles.grayscaleOverlay}
-            />
-          </View>
-
-          <View className="mt-4 px-2 w-full gap-2.5">
-            <Text className="font-bold mb-4">{image.author}</Text>
-            <View className="flex-row gap-4">
-              <Text>Width: {image.width}px</Text>
-              <Text>Height: {image.height}px</Text>
+        <View className="shadow-sm shadow-black">
+          <Pressable
+            className="items-center rounded-2xl bg-white px-4 pb-6 pt-4"
+            style={{ width: infoBoxWidth }}
+            onPress={(e) => e.stopPropagation()}>
+            <View className="self-end rounded-full bg-white p-1 mb-5 shadow-sm shadow-black">
+              <TouchableOpacity onPress={onClose} hitSlop={8}>
+                <MaterialIcons name="close" size={24} color="black" />
+              </TouchableOpacity>
             </View>
-            <Text onPress={() => Linking.openURL(image.download_url)}>
-              URL: {image.download_url}
-            </Text>
-          </View>
-        </Pressable>
+            <View className="relative overflow-hidden rounded-xl">
+              <Image
+                source={{ uri: image.download_url }}
+                className="rounded-xl"
+                style={{ width: imageSize, height: imageSize }}
+                contentFit="cover"
+                priority="high"
+                cachePolicy="memory-disk"
+                placeholder={{ blurhash: 'L6PZfSi_.AyE_3t7t7R**0o#DgR4' }}
+                transition={200}
+              />
+              <View
+                className="absolute bottom-0 left-0 right-0 top-0 rounded-xl"
+                style={styles.grayscaleOverlay}
+              />
+            </View>
+
+            <View className="mt-4 w-full gap-2.5 px-2">
+              <Text className="mb-4 font-bold">{image.author}</Text>
+              <View className="flex-row gap-4 ">
+                <Text>Width: {image.width}px</Text>
+                <Text>Height: {image.height}px</Text>
+              </View>
+              <View className="flex-row items-center  gap-1">
+                <MaterialIcons name="download" size={16} color="#000" />
+                <Text onPress={() => Linking.openURL(image.download_url)}>
+                  {image.download_url}
+                </Text>
+              </View>
+            </View>
+          </Pressable>
+        </View>
       </Pressable>
     </Modal>
   );
